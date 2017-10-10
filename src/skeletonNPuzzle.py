@@ -1,9 +1,8 @@
 #Skeleton
 from random import randint
-from os import path
 
 class Matrix:
-
+    
     def __init__(self):
         self.instance = [[]]
         self.i0 = 0
@@ -80,10 +79,3 @@ class Matrix:
             self.instance[self.i0][self.j0] = self.instance[self.i0][self.j0+1]
             self.instance[self.i0][self.j0+1] = 0
             self.j0 += 1
-            
-m = Matrix()
-pth = path.abspath("")
-pth = pth[:len(pth)-3]
-m.loadMatrix(pth+"/matrix.txt")
-m.shuffleInstance(100)
-m.show()
