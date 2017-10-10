@@ -1,6 +1,6 @@
 #Skeleton
 from random import randint
-
+from os import path
 
 class Matrix:
 
@@ -61,8 +61,6 @@ class Matrix:
             while possibleMoves[move] == 0:
                 move += 1
             self.swap(move)
-            self.show()
-            print()
             times -= 1
 
     def swap(self, moviment):
@@ -84,5 +82,8 @@ class Matrix:
             self.j0 += 1
             
 m = Matrix()
-m.loadMatrix("matrix.txt")
-m.shuffleInstance(3)
+pth = path.abspath("")
+pth = pth[:len(pth)-3]
+m.loadMatrix(pth+"/matrix.txt")
+m.shuffleInstance(100)
+m.show()
