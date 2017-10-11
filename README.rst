@@ -1,1 +1,0 @@
-N-puzzle searches
