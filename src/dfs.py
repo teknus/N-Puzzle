@@ -1,8 +1,8 @@
-from Npuzzle import Matrix
+from Npuzzle import Board
 from os import path
 
-m = Matrix()
-m2 = Matrix()
+m = Board()
+m2 = Board()
 pth = path.abspath("")
 pth = pth[:len(pth)-3]
 m.loadMatrix(pth+"/matrix.txt")

@@ -1,7 +1,7 @@
 #Skeleton
 from random import randint
 
-class Matrix:
+class Board:
     
     def __init__(self):
         self.instance = list(list())
