@@ -1,5 +1,6 @@
 #Skeleton
 from random import randint
+from os import path
 
 class Board:
     
@@ -9,6 +10,7 @@ class Board:
         self.j0 = 0
         self.dimension = 0
         self.possibleMoves = [0,0,0,0]
+        self.objective = list(list())
 
     def loadMatrix(self, path):
         with open(path, 'r') as arq:
@@ -27,6 +29,7 @@ class Board:
                     j += 1
                 i += 1
             self.instance = matrix
+            self.objective = matrix
             self.dimension = tam
         
     def show(self):
@@ -35,7 +38,18 @@ class Board:
 
     def shuffleInstance(self,times):
         while times > 0:
-            self.updatePossibleMoves()
+            #up
+            if not self.i0 - 1 < 0:
+                self.possibleMoves[0] = 1
+            #down
+            if not self.i0 + 1 == self.dimension:
+                self.possibleMoves[1] = 1
+            #left
+            if not self.j0 - 1 < 0:
+                self.possibleMoves[2] = 1
+            #right
+            if not self.j0 + 1 == self.dimension:
+                self.possibleMoves[3] = 1
             move = randint(0,sum(self.possibleMoves)-1)
             while self.possibleMoves[move] == 0:
                 move += 1
@@ -100,6 +114,32 @@ class Board:
             self.moveLeft()
         elif moviment == 3:
             self.moveRight()
+
+    def copy(self):
+        newCopy = Board()
+
+        pth = path.abspath("")
+        pth = pth[:len(pth)-3]
+        newCopy.loadMatrix(pth+"/matrix.txt")
+        
+        i = 0
+        while i < self.dimension:
+            j = 0
+            while j < self.dimension:
+                newCopy.instance[i][j] = self.instance[i][j]            
+                j+=1
+            i+=1
+        newCopy.i0 = self.i0
+        newCopy.j0 = self.j0 
+        newCopy.dimension = self.dimension
+        newCopy.possibleMoves = self.possibleMoves[:]
+        while i < self.dimension:
+            j = 0
+            while j < self.dimension:
+                newCopy.objective[i][j] = self.objective[i][j]            
+                j+=1
+            i+=1
+        return newCopy
     
     def __eq__(self,other):
         i = 0
@@ -111,3 +151,56 @@ class Board:
                j += 1
             i += 1
         return True
+    def __repr__(self):
+        s = "\n\n"
+        for i in self.instance:
+            s += "|"
+            for j in i:
+                s += str(j)+" "
+            s += "|"
+            s += "\n"
+        return s[1:]
+    
+    def __str__(self):
+        s = "\n\n"
+        for i in self.instance:
+            s += "|"
+            for j in i:
+                s += str(j)+" "
+            s += "|"
+            s += "\n"
+        return s[1:]
+
+    #Hugo
+    def bfs(self, targetBoard, actualBoard):
+        expandedNodes = []
+        NodetoExpand = []
+        b = 0
+        NodetoExpand.append(actualBoard)
+        while True:
+            if(len(NodetoExpand) == 0):
+                break          
+            nodeToParse = NodetoExpand.pop(0)
+            if nodeToParse == targetBoard:
+                break
+            moves = nodeToParse.possibleMoves[:]
+            expandedNodes.append(nodeToParse)
+            index = 0
+            while(index < 4):
+                boardCopy = nodeToParse.copy()
+                if(moves[index] == 1):
+                    b += 1
+                    if(index == 0):                 
+                        boardCopy.moveUp()
+                    elif(index == 1):                   
+                        boardCopy.moveDown()
+                    elif(index == 2):                  
+                        boardCopy.moveLeft()
+                    elif(index == 3):                
+                        boardCopy.moveRight()
+                if(boardCopy not in expandedNodes):
+                    if(boardCopy not in NodetoExpand):
+                        NodetoExpand.append(boardCopy)
+                index += 1
+        return NodetoExpand,expandedNodes,b
+        
