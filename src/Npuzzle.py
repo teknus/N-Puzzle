@@ -35,18 +35,7 @@ class Board:
 
     def shuffleInstance(self,times):
         while times > 0:
-            #up
-            if not self.i0 - 1 < 0:
-                self.possibleMoves[0] = 1
-            #down
-            if not self.i0 + 1 == self.dimension:
-                self.possibleMoves[1] = 1
-            #left
-            if not self.j0 - 1 < 0:
-                self.possibleMoves[2] = 1
-            #right
-            if not self.j0 + 1 == self.dimension:
-                self.possibleMoves[3] = 1
+            self.updatePossibleMoves()
             move = randint(0,sum(self.possibleMoves)-1)
             while self.possibleMoves[move] == 0:
                 move += 1
