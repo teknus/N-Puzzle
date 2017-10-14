@@ -4,7 +4,7 @@ from random import randint
 class Matrix:
     
     def __init__(self):
-        self.instance = [[]]
+        self.instance = list(list())
         self.i0 = 0
         self.j0 = 0
         self.dimension = 0
@@ -18,8 +18,7 @@ class Matrix:
             i =0 
             for line in lines:
                 j=0
-                splitedLine = line.split(" ")
-                for item in splitedLine:
+                for item in line.split(" "):
                     matrix[i][j] = int(item)
                     j += 1
                 i += 1
@@ -79,3 +78,14 @@ class Matrix:
             self.instance[self.i0][self.j0] = self.instance[self.i0][self.j0+1]
             self.instance[self.i0][self.j0+1] = 0
             self.j0 += 1
+    
+    def __eq__(self,other):
+        i = 0
+        while i < self.dimension:
+            j = 0
+            while j < self.dimension:
+               if self.instance[i][j] != other.instance[i][j]:
+                   return False
+               j += 1
+            i += 1
+        return True
