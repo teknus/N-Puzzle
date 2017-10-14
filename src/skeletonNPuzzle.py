@@ -19,26 +19,18 @@ class Matrix:
             for line in lines:
                 j=0
                 for item in line.split(" "):
+                    if int(item) == 0:
+                        self.i0 = i
+                        self.j0 = j
                     matrix[i][j] = int(item)
                     j += 1
                 i += 1
             self.instance = matrix
-            self.findZero()
             self.dimension = tam
         
     def show(self):
         for line in self.instance:
             print(line)
-
-    def findZero(self):
-        self.i0 = 0
-        for line in self.instance:
-            self.j0 = 0
-            for number in line:
-                if number == 0:
-                    return
-                self.j0 += 1
-            self.i0 += 1
 
     def shuffleInstance(self,times):
         while times > 0:
