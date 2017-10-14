@@ -8,6 +8,7 @@ class Matrix:
         self.i0 = 0
         self.j0 = 0
         self.dimension = 0
+        self.possibleMoves = [0,0,0,0]
 
     def loadMatrix(self, path):
         with open(path, 'r') as arq:
@@ -34,42 +35,82 @@ class Matrix:
 
     def shuffleInstance(self,times):
         while times > 0:
-            possibleMoves = [0,0,0,0]
             #up
             if not self.i0 - 1 < 0:
-                possibleMoves[0] = 1
+                self.possibleMoves[0] = 1
             #down
             if not self.i0 + 1 == self.dimension:
-                possibleMoves[1] = 1
+                self.possibleMoves[1] = 1
             #left
             if not self.j0 - 1 < 0:
-                possibleMoves[2] = 1
+                self.possibleMoves[2] = 1
             #right
             if not self.j0 + 1 == self.dimension:
-                possibleMoves[3] = 1
-            move = randint(0,sum(possibleMoves)-1)
-            while possibleMoves[move] == 0:
+                self.possibleMoves[3] = 1
+            move = randint(0,sum(self.possibleMoves)-1)
+            while self.possibleMoves[move] == 0:
                 move += 1
             self.swap(move)
             times -= 1
+    
+    def moveUp(self):
+        self.instance[self.i0][self.j0] = self.instance[self.i0-1][self.j0]
+        self.instance[self.i0-1][self.j0] = 0
+        self.i0 -= 1
+        self.updatePossibleMoves()
+    
+    def moveDown(self):
+        self.instance[self.i0][self.j0] = self.instance[self.i0+1][self.j0]
+        self.instance[self.i0+1][self.j0] = 0
+        self.i0 += 1
+        self.updatePossibleMoves()
+    
+    def moveLeft(self):
+        self.instance[self.i0][self.j0] = self.instance[self.i0][self.j0-1]
+        self.instance[self.i0][self.j0-1] = 0
+        self.j0 -= 1
+        self.updatePossibleMoves()
+    
+    def moveRight(self):
+        self.instance[self.i0][self.j0] = self.instance[self.i0][self.j0+1]
+        self.instance[self.i0][self.j0+1] = 0
+        self.j0 += 1
+        self.updatePossibleMoves()
+    
+    def updatePossibleMoves(self):
+        #up
+        if not self.i0 - 1 < 0:
+            self.possibleMoves[0] = 1
+        else:
+            self.possibleMoves[0] = 0
+
+        #down
+        if not self.i0 + 1 == self.dimension:
+            self.possibleMoves[1] = 1
+        else:
+            self.possibleMoves[1] = 0
+
+        #left
+        if not self.j0 - 1 < 0:
+            self.possibleMoves[2] = 1
+        else:
+            self.possibleMoves[2] = 0
+
+        #right
+        if not self.j0 + 1 == self.dimension:
+            self.possibleMoves[3] = 1
+        else:
+            self.possibleMoves[3] = 0
 
     def swap(self, moviment):
         if moviment == 0:
-            self.instance[self.i0][self.j0] = self.instance[self.i0-1][self.j0]
-            self.instance[self.i0-1][self.j0] = 0
-            self.i0 -= 1
+            self.moveUp()
         elif moviment == 1:
-            self.instance[self.i0][self.j0] = self.instance[self.i0+1][self.j0]
-            self.instance[self.i0+1][self.j0] = 0
-            self.i0 += 1
+            self.moveDown()
         elif moviment == 2:
-            self.instance[self.i0][self.j0] = self.instance[self.i0][self.j0-1]
-            self.instance[self.i0][self.j0-1] = 0
-            self.j0 -= 1
+            self.moveLeft()
         elif moviment == 3:
-            self.instance[self.i0][self.j0] = self.instance[self.i0][self.j0+1]
-            self.instance[self.i0][self.j0+1] = 0
-            self.j0 += 1
+            self.moveRight()
     
     def __eq__(self,other):
         i = 0
