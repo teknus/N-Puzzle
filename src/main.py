@@ -19,3 +19,7 @@ print(m)
 print("BFS")
 exp, b = m.bfs(obj,m)
 print(len(exp),b)
+
+print("DFS")
+exp, b = m.dfs(obj,m)
+print(len(exp),b)

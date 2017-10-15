@@ -236,8 +236,6 @@ class Board:
                     if boardCopy not in expandedNodes:
                         NodetoExpand.append([boardCopy,0])
                         stack.append([nodeToParse[0].copy(),index])
-                        print("On Stack: ",nodeToParse[0].copy())
-                        print("ToExpand: ",boardCopy)
                         break
                 index += 1
         return expandedNodes,b
