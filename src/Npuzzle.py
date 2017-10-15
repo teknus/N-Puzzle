@@ -1,4 +1,4 @@
-#Skeleton
+#-*- encoding:utf-8 -*-
 from random import randint
 from os import path
 
@@ -117,11 +117,8 @@ class Board:
 
     def copy(self):
         newCopy = Board()
-
-        pth = path.abspath("")
-        pth = pth[:len(pth)-3]
-        newCopy.loadMatrix(pth+"/matrix.txt")
-        
+        newCopy.dimension = self.dimension
+        newCopy.instance = [[0 for x in range(newCopy.dimension)] for y in range(newCopy.dimension)]
         i = 0
         while i < self.dimension:
             j = 0
@@ -178,7 +175,7 @@ class Board:
         b = 0
         NodetoExpand.append(actualBoard)
         while True:
-            if(len(NodetoExpand) == 0):
+            if len(NodetoExpand) == 0:
                 break          
             nodeToParse = NodetoExpand.pop(0)
             if nodeToParse == targetBoard:
@@ -186,21 +183,61 @@ class Board:
             moves = nodeToParse.possibleMoves[:]
             expandedNodes.append(nodeToParse)
             index = 0
-            while(index < 4):
+            while index < 4:
                 boardCopy = nodeToParse.copy()
-                if(moves[index] == 1):
+                if moves[index] == 1:
                     b += 1
-                    if(index == 0):                 
+                    if index == 0:                 
                         boardCopy.moveUp()
-                    elif(index == 1):                   
+                    elif index == 1:                   
                         boardCopy.moveDown()
-                    elif(index == 2):                  
+                    elif index == 2:                  
                         boardCopy.moveLeft()
-                    elif(index == 3):                
+                    elif index == 3:                
                         boardCopy.moveRight()
-                if(boardCopy not in expandedNodes):
-                    if(boardCopy not in NodetoExpand):
+                if boardCopy not in expandedNodes:
+                    if boardCopy not in NodetoExpand:
                         NodetoExpand.append(boardCopy)
                 index += 1
-        return NodetoExpand,expandedNodes,b
+        return expandedNodes,b
         
+    def dfs(self, targetBoard, actualBoard):
+        expandedNodes = []
+        NodetoExpand = []
+        stack = []
+        b = 0
+        NodetoExpand.append([actualBoard,0])
+        while True:
+            if len(NodetoExpand) == 0:
+                if len(stack) > 0:
+                    node = stack.pop()
+                    NodetoExpand.append(node)
+                else:
+                    break
+            nodeToParse = NodetoExpand.pop()
+            if nodeToParse[0] == targetBoard:
+                print(nodeToParse)
+                break
+            moves = nodeToParse[0].possibleMoves[:]
+            expandedNodes.append(nodeToParse[0])
+            index = nodeToParse[1]
+            while index < 4:
+                boardCopy = nodeToParse[0].copy()
+                if(moves[index] == 1):
+                    b += 1
+                    if index == 0:                 
+                        boardCopy.moveUp()
+                    elif index == 1:                   
+                        boardCopy.moveDown()
+                    elif index == 2:                  
+                        boardCopy.moveLeft()
+                    elif index == 3:                
+                        boardCopy.moveRight()
+                    if boardCopy not in expandedNodes:
+                        NodetoExpand.append([boardCopy,0])
+                        stack.append([nodeToParse[0].copy(),index])
+                        print("On Stack: ",nodeToParse[0].copy())
+                        print("ToExpand: ",boardCopy)
+                        break
+                index += 1
+        return expandedNodes,b

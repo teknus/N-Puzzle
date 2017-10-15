@@ -4,9 +4,18 @@ from os import path
 m = Board()
 
 pth = path.abspath("")
-pth = pth[:len(pth)-3]
-m.loadMatrix(pth+"/matrix.txt")
+pth = pth[:len(pth)-3]+"matrix.txt"
+m.loadMatrix(pth)
 obj = Board()
-obj.loadMatrix(pth+"/matrix.txt")
+obj.loadMatrix(pth)
+print("Pre shuffle")
+print(m)
 m.moveDown()
-print(m.bfs(obj, m))
+m.moveRight()
+m.moveRight()
+m.moveUp()
+m.moveUp()
+print(m)
+print("BFS")
+exp, b = m.bfs(obj,m)
+print(len(exp),b)
