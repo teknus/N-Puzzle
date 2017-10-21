@@ -10,7 +10,7 @@ class Board:
         self.j0 = 0
         self.dimension = 0
         self.possibleMoves = [0,0,0,0]
-        self.objective = list(list())
+        self.actualManhattan = dict()
 
     def loadMatrix(self, path):
         with open(path, 'r') as arq:
@@ -31,7 +31,38 @@ class Board:
             self.instance = matrix
             self.objective = matrix
             self.dimension = tam
-        
+            self.findAll()
+
+    def find(self,n):
+        i = 0
+        for line in self.instance:
+            j =0 
+            for item in line:
+                if item == n:
+                    return i,j
+                j += 1
+            i += 1
+
+    def manhattanDistance(self, obj, actual):
+        return abs(-1 * (obj[0] + obj[1]) + (actual[0]+actual[1]))
+    
+    def manhattanDistanceValue(self, targetBoard):
+        i = (self.dimension * self.dimension) - 1
+        value = 0
+        while i > 0:
+            l = self.manhattanDistance(self.actualManhattan[i],targetBoard.actualManhattan[i])
+            print(l,i)
+            value += l
+            i -= 1
+        return value            
+
+    def findAll(self):
+        i = 0
+        roof = (self.dimension * self.dimension)
+        while i < roof:
+            self.actualManhattan[i] = self.find(i)
+            i += 1
+
     def show(self):
         for line in self.instance:
             print(line)
@@ -55,6 +86,7 @@ class Board:
                 move += 1
             self.swap(move)
             times -= 1
+        self.findAll()
     
     def moveUp(self):
         self.instance[self.i0][self.j0] = self.instance[self.i0-1][self.j0]
@@ -148,6 +180,7 @@ class Board:
                j += 1
             i += 1
         return True
+
     def __repr__(self):
         s = "\n\n"
         for i in self.instance:
@@ -172,7 +205,7 @@ class Board:
     def bfs(self, targetBoard, actualBoard):
         expandedNodes = []
         NodetoExpand = []
-        b = 0
+        b = sum(actualBoard.possibleMoves)
         NodetoExpand.append(actualBoard)
         while True:
             if len(NodetoExpand) == 0:
@@ -181,12 +214,12 @@ class Board:
             if nodeToParse == targetBoard:
                 break
             moves = nodeToParse.possibleMoves[:]
+            b = (sum(moves)+b)/2
             expandedNodes.append(nodeToParse)
             index = 0
             while index < 4:
                 boardCopy = nodeToParse.copy()
                 if moves[index] == 1:
-                    b += 1
                     if index == 0:                 
                         boardCopy.moveUp()
                     elif index == 1:                   
@@ -200,12 +233,13 @@ class Board:
                         NodetoExpand.append(boardCopy)
                 index += 1
         return expandedNodes,b
-        
+    
+    #profundidade
     def dfs(self, targetBoard, actualBoard):
         expandedNodes = []
         NodetoExpand = []
         stack = []
-        b = 0
+        b = sum(actualBoard.possibleMoves)
         NodetoExpand.append([actualBoard,0])
         while True:
             if len(NodetoExpand) == 0:
@@ -216,15 +250,14 @@ class Board:
                     break
             nodeToParse = NodetoExpand.pop()
             if nodeToParse[0] == targetBoard:
-                print(nodeToParse)
                 break
             moves = nodeToParse[0].possibleMoves[:]
+            b = (sum(moves)+b)/2
             expandedNodes.append(nodeToParse[0])
             index = nodeToParse[1]
             while index < 4:
                 boardCopy = nodeToParse[0].copy()
                 if(moves[index] == 1):
-                    b += 1
                     if index == 0:                 
                         boardCopy.moveUp()
                     elif index == 1:                   
