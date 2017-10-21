@@ -1,4 +1,4 @@
-dim = 3
+dim = 4
 instance = [[]]
 
 i = 0
@@ -14,6 +14,14 @@ while i < dim:
 matrix[dim-1][dim-1] = 0
 instance = matrix
 
-for line in instance:
-		print (line)
+with open("test"+str(dim)+".txt","w") as file:
+    file.write(str(dim)+"\n")
+    for line in instance:
+        s = ""
+        for l in line:
+            s += str(l)
+            s += " "
+        s += "\n"
+        file.write(s)
+            
         
