@@ -250,6 +250,7 @@ class BoardH(Board):
     def __init__(self):
         Board.__init__(self)
         self.actualManhattan = dict()
+        self.d = 0
         self.h = 0
 
     def loadMatrix(self, path):
@@ -429,3 +430,42 @@ class BoardH(Board):
                         NodetoExpand.put((item.h,item))
                 index += 1
         return expandedNodes,b
+
+    def IDA(self, targetBoard,actualBoard):
+        expandedNodes = []
+        b = sum(actualBoard.possibleMoves)
+        NodetoExpand = Q.PriorityQueue()
+        NodetoExpand.put((actualBoard.h,actualBoard))
+        while True:
+            if NodetoExpand.empty():
+                break          
+            nodeToParse = NodetoExpand.get()
+            if nodeToParse[1] == targetBoard:
+                break
+            moves = nodeToParse[1].possibleMoves[:]
+            b = (sum(moves)+b)/2
+            expandedNodes.append(nodeToParse[1])
+            index = 0
+            while index < 4:
+                boardCopy = nodeToParse[1].copy()
+                if moves[index] == 1:
+                    if index == 0:                 
+                        boardCopy.moveUp()
+                    elif index == 1:                   
+                        boardCopy.moveDown()
+                    elif index == 2:                  
+                        boardCopy.moveLeft()
+                    elif index == 3:                
+                        boardCopy.moveRight()
+                if boardCopy not in expandedNodes:
+                    temp = []
+                    while not NodetoExpand.empty():
+                        temp.append(NodetoExpand.get()[1])
+                    if boardCopy not in temp:
+                        boardCopy.manhattanDistanceValue(targetBoard)
+                        NodetoExpand.put((boardCopy.h,boardCopy))
+                    for item in temp:
+                        NodetoExpand.put((item.h,item))
+                index += 1
+        return expandedNodes,b
+#Guardar a profundidade junto com o nó na lista de nós para expandir
