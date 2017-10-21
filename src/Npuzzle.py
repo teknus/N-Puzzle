@@ -44,12 +44,14 @@ class Board:
             i += 1
 
     def manhattanDistance(self, obj, actual):
-        return abs(-1 * (obj[0] + obj[1]) + (actual[0]+actual[1]))
+        if obj[0] == actual[0] and obj[1] == actual[1]:
+            return 0
+        return abs((obj[0] - actual[0])) + abs((obj[1]-actual[1]))
     
     def manhattanDistanceValue(self, targetBoard):
         i = (self.dimension * self.dimension) - 1
         value = 0
-        while i > 0:
+        while i >= 0:
             l = self.manhattanDistance(self.actualManhattan[i],targetBoard.actualManhattan[i])
             print(l,i)
             value += l
