@@ -1,6 +1,8 @@
 #-*- encoding:utf-8 -*-
 from random import randint
 from os import path
+import queue as Q
+
 
 class Board:
     
@@ -248,6 +250,7 @@ class BoardH(Board):
     def __init__(self):
         Board.__init__(self)
         self.actualManhattan = dict()
+        self.h = 0
 
     def loadMatrix(self, path):
         with open(path, 'r') as arq:
@@ -293,10 +296,9 @@ class BoardH(Board):
         value = 0
         while i >= 0:
             l = self.manhattanDistance(self.actualManhattan[i],targetBoard.actualManhattan[i])
-            print(l,i)
             value += l
             i -= 1
-        return value            
+        self.h = value          
 
     def findAll(self):
         i = 0
@@ -353,7 +355,7 @@ class BoardH(Board):
         self.findAll()
 
     def copy(self):
-        newCopy = Board()
+        newCopy = BoardH()
         newCopy.dimension = self.dimension
         newCopy.instance = [[0 for x in range(newCopy.dimension)] for y in range(newCopy.dimension)]
         i = 0
@@ -367,7 +369,7 @@ class BoardH(Board):
         newCopy.j0 = self.j0 
         newCopy.dimension = self.dimension
         newCopy.possibleMoves = self.possibleMoves[:]
-        newCopy.actualManhattan = self.actualManhattan[:]
+        newCopy.actualManhattan = self.actualManhattan
         while i < self.dimension:
             j = 0
             while j < self.dimension:
@@ -386,24 +388,27 @@ class BoardH(Board):
                j += 1
             i += 1
         return True
+
+    def __lt__(self,other):
+        return self.h < other.h
         
     def aStar(self, targetBoard,actualBoard):
         expandedNodes = []
-        NodetoExpand = []
         b = sum(actualBoard.possibleMoves)
-        NodetoExpand.append(actualBoard)
+        NodetoExpand = Q.PriorityQueue()
+        NodetoExpand.put((actualBoard.h,actualBoard))
         while True:
-            if len(NodetoExpand) == 0:
+            if NodetoExpand.empty():
                 break          
-            nodeToParse = NodetoExpand.pop(0)
-            if nodeToParse == targetBoard:
+            nodeToParse = NodetoExpand.get()
+            if nodeToParse[1] == targetBoard:
                 break
-            moves = nodeToParse.possibleMoves[:]
+            moves = nodeToParse[1].possibleMoves[:]
             b = (sum(moves)+b)/2
-            expandedNodes.append(nodeToParse)
+            expandedNodes.append(nodeToParse[1])
             index = 0
             while index < 4:
-                boardCopy = nodeToParse.copy()
+                boardCopy = nodeToParse[1].copy()
                 if moves[index] == 1:
                     if index == 0:                 
                         boardCopy.moveUp()
@@ -414,7 +419,13 @@ class BoardH(Board):
                     elif index == 3:                
                         boardCopy.moveRight()
                 if boardCopy not in expandedNodes:
-                    if boardCopy not in NodetoExpand:
-                        NodetoExpand.append(boardCopy)
+                    temp = []
+                    while not NodetoExpand.empty():
+                        temp.append(NodetoExpand.get()[1])
+                    if boardCopy not in temp:
+                        boardCopy.manhattanDistanceValue(targetBoard)
+                        NodetoExpand.put((boardCopy.h,boardCopy))
+                    for item in temp:
+                        NodetoExpand.put((item.h,item))
                 index += 1
         return expandedNodes,b
