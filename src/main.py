@@ -1,12 +1,12 @@
-from Npuzzle import Board
+from Npuzzle import Board, BoardH
 from os import path
 
-m = Board()
+m = BoardH()
 
 pth = path.abspath("")
-pth = pth[:len(pth)-3]+"matrix.txt"
+pth = pth[:len(pth)-3]+"test3.txt"
 m.loadMatrix(pth)
-obj = Board()
+obj = BoardH()
 obj.loadMatrix(pth)
 print("Pre shuffle")
 print(m)
