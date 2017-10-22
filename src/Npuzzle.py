@@ -11,6 +11,7 @@ class Board:
         self.i0 = 0
         self.j0 = 0
         self.dimension = 0
+        self.d = 0
         self.possibleMoves = [0,0,0,0]
 
     def loadMatrix(self, path):
@@ -133,6 +134,7 @@ class Board:
         newCopy.i0 = self.i0
         newCopy.j0 = self.j0 
         newCopy.dimension = self.dimension
+        newCopy.d = self.d
         newCopy.possibleMoves = self.possibleMoves[:]
         while i < self.dimension:
             j = 0
@@ -184,13 +186,14 @@ class Board:
                 break          
             nodeToParse = NodetoExpand.pop(0)
             if nodeToParse == targetBoard:
-                break
+                 return expandedNodes,b, nodeToParse.d
             moves = nodeToParse.possibleMoves[:]
             b = (sum(moves)+b)/2
             expandedNodes.append(nodeToParse)
             index = 0
             while index < 4:
                 boardCopy = nodeToParse.copy()
+                boardCopy.d += 1
                 if moves[index] == 1:
                     if index == 0:                 
                         boardCopy.moveUp()
@@ -204,13 +207,21 @@ class Board:
                     if boardCopy not in NodetoExpand:
                         NodetoExpand.append(boardCopy)
                 index += 1
-        return expandedNodes,b
     
     #profundidade
     def dfs(self, targetBoard, actualBoard):
+        iterator = 0
+        while True:
+            expandedNodes,b, solved, d = self.dfsL(targetBoard, actualBoard, iterator)
+            if solved:
+                return expandedNodes, b, d
+            iterator += 3
+    
+    def dfsL(self, targetBoard,actualBoard, dLimit):
         expandedNodes = []
         NodetoExpand = []
         stack = []
+        solved = False
         b = sum(actualBoard.possibleMoves)
         NodetoExpand.append([actualBoard,0])
         while True:
@@ -222,13 +233,15 @@ class Board:
                     break
             nodeToParse = NodetoExpand.pop()
             if nodeToParse[0] == targetBoard:
-                break
+                solved = True
+                return expandedNodes, b, solved, nodeToParse[0].d
             moves = nodeToParse[0].possibleMoves[:]
             b = (sum(moves)+b)/2
             expandedNodes.append(nodeToParse[0])
             index = nodeToParse[1]
             while index < 4:
                 boardCopy = nodeToParse[0].copy()
+                boardCopy.d += 1
                 if(moves[index] == 1):
                     if index == 0:                 
                         boardCopy.moveUp()
@@ -239,12 +252,13 @@ class Board:
                     elif index == 3:                
                         boardCopy.moveRight()
                     if boardCopy not in expandedNodes:
-                        NodetoExpand.append([boardCopy,0])
-                        stack.append([nodeToParse[0].copy(),index])
+                        if boardCopy not in NodetoExpand:
+                            if not boardCopy.d > dLimit:
+                                NodetoExpand.append([boardCopy,0])
+                                stack.append([nodeToParse[0].copy(),index])
                         break
-                index += 1
-        return expandedNodes,b
-
+                index += 1 
+        return expandedNodes, b, solved ,0
 
 class BoardH(Board):
     def __init__(self):
@@ -252,7 +266,6 @@ class BoardH(Board):
         self.actualManhattan = dict()
         self.d = 0
         self.h = 0
-        self.d = 0
 
     def loadMatrix(self, path):
         with open(path, 'r') as arq:
@@ -370,6 +383,7 @@ class BoardH(Board):
         newCopy.i0 = self.i0
         newCopy.j0 = self.j0 
         newCopy.dimension = self.dimension
+        newCopy.d = self.d
         newCopy.possibleMoves = self.possibleMoves[:]
         newCopy.actualManhattan = self.actualManhattan
         while i < self.dimension:
@@ -404,57 +418,7 @@ class BoardH(Board):
                 break          
             nodeToParse = NodetoExpand.get()
             if nodeToParse[1] == targetBoard:
-                break
-            moves = nodeToParse[1].possibleMoves[:]
-            b = (sum(moves)+b)/2
-            expandedNodes.append(nodeToParse[1])
-            index = 0
-            while index < 4:
-                boardCopy = nodeToParse[1].copy()
-                if moves[index] == 1:
-                    if index == 0:                 
-                        boardCopy.moveUp()
-                    elif index == 1:                   
-                        boardCopy.moveDown()
-                    elif index == 2:                  
-                        boardCopy.moveLeft()
-                    elif index == 3:                
-                        boardCopy.moveRight()
-                if boardCopy not in expandedNodes:
-                    temp = []
-                    while not NodetoExpand.empty():
-                        temp.append(NodetoExpand.get()[1])
-                    if boardCopy not in temp:
-                        boardCopy.manhattanDistanceValue(targetBoard)
-                        NodetoExpand.put((boardCopy.h,boardCopy))
-                    for item in temp:
-                        NodetoExpand.put((item.h,item))
-                index += 1
-        return expandedNodes,b
-    
-    def idaStar(self, targetBoard, actualBoard):
-        iterator = 1
-        while True:
-            expandedNodes,b, solved = self.idaDoThisShit(targetBoard, actualBoard, iterator)
-            if solved:
-                return expandedNodes, b
-            iterator += 1
-
-    
-    def idaDoThisShit(self, targetBoard, actualBoard, dLimit):
-        expandedNodes = []
-        solved = False
-        b = sum(actualBoard.possibleMoves)
-        NodetoExpand = Q.PriorityQueue()
-        NodetoExpand.put((actualBoard.h,actualBoard))
-        while True:
-            if NodetoExpand.empty():
-                break          
-            nodeToParse = NodetoExpand.get()
-            if nodeToParse[1] == targetBoard:
-                solved = True
-                #print(nodeToParse[1])
-                break
+                return expandedNodes,b, nodeToParse[1].d
             moves = nodeToParse[1].possibleMoves[:]
             b = (sum(moves)+b)/2
             expandedNodes.append(nodeToParse[1])
@@ -477,10 +441,72 @@ class BoardH(Board):
                         temp.append(NodetoExpand.get()[1])
                     if boardCopy not in temp:
                         boardCopy.manhattanDistanceValue(targetBoard)
-                        if not boardCopy.d > dLimit:
-                            NodetoExpand.put((boardCopy.h,boardCopy))
+                        NodetoExpand.put((boardCopy.h,boardCopy))
                     for item in temp:
                         NodetoExpand.put((item.h,item))
                 index += 1
-        return expandedNodes,b, solved 
+    
+    def idaStar(self, targetBoard, actualBoard):
+        iterator = 0
+        actualBoard.manhattanDistanceValue(targetBoard)
+        limit = actualBoard.h
+        while True:
+            expandedNodes, b, solved, limit, d = self.idaDoThis(targetBoard, actualBoard, limit)
+            if solved:
+                return expandedNodes, b, d
+
+    
+    def idaDoThis(self, targetBoard, actualBoard, dLimit):
+        expandedNodes = []
+        solved = False
+        b = sum(actualBoard.possibleMoves)
+        NodetoExpand = Q.PriorityQueue()
+        NodeNotExpanded = Q.PriorityQueue()
+        NodetoExpand.put((actualBoard.h,actualBoard))
+        while True:
+            if NodetoExpand.empty():
+                limit = NodeNotExpanded.get()[0]
+                while not limit < dLimit:
+                    print("Menor")
+                    limit = NodeNotExpanded.get()[0]
+                return expandedNodes, b, solved,limit, 0           
+            nodeToParse = NodetoExpand.get()
+            if nodeToParse[1] == targetBoard:
+                solved = True
+                return expandedNodes,b, solved,0 ,nodeToParse[1].d
+            moves = nodeToParse[1].possibleMoves[:]
+            b = (sum(moves)+b)/2
+            expandedNodes.append(nodeToParse[1])
+            index = 0
+            while index < 4:
+                boardCopy = nodeToParse[1].copy()
+                boardCopy.d += 1
+                if moves[index] == 1:
+                    if index == 0:                 
+                        boardCopy.moveUp()
+                    elif index == 1:                   
+                        boardCopy.moveDown()
+                    elif index == 2:                  
+                        boardCopy.moveLeft()
+                    elif index == 3:                
+                        boardCopy.moveRight()
+                if boardCopy not in expandedNodes:
+                    temp = []
+                    while not NodetoExpand.empty():
+                        temp.append(NodetoExpand.get()[1])
+                    if boardCopy not in expandedNodes:
+                        temp = []
+                        while not NodetoExpand.empty():
+                            temp.append(NodetoExpand.get()[1])
+                        if boardCopy not in temp:
+                            boardCopy.manhattanDistanceValue(targetBoard)
+                            if not boardCopy.d > dLimit:
+                                NodetoExpand.put((boardCopy.h,boardCopy))
+                            else:
+                                NodetoExpand.put((boardCopy.h,boardCopy))
+                        for item in temp:
+                            NodetoExpand.put((item.h,item))
+                        break
+                index += 1
+
 #Guardar a profundidade junto com o nó na lista de nós para expandir
