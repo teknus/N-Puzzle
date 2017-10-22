@@ -192,7 +192,7 @@ class Board:
             index = 0
             while index < 4:
                 boardCopy = nodeToParse.copy()
-                boardCopy.d += 1
+                boardCopy.d = nodeToParse.d + 1
                 if moves[index] == 1:
                     if index == 0:                 
                         boardCopy.moveUp()
@@ -240,7 +240,7 @@ class Board:
             index = nodeToParse[1]
             while index < 4:
                 boardCopy = nodeToParse[0].copy()
-                boardCopy.d += 1
+                boardCopy.d = nodeToParse[0].d + 1
                 if(moves[index] == 1):
                     if index == 0:                 
                         boardCopy.moveUp()
