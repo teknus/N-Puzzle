@@ -251,6 +251,7 @@ class BoardH(Board):
         Board.__init__(self)
         self.actualManhattan = dict()
         self.h = 0
+        self.d = 0
 
     def loadMatrix(self, path):
         with open(path, 'r') as arq:
@@ -429,3 +430,55 @@ class BoardH(Board):
                         NodetoExpand.put((item.h,item))
                 index += 1
         return expandedNodes,b
+    
+    def idaStar(self, targetBoard, actualBoard):
+        iterator = 1
+        while True:
+            expandedNodes,b, solved = self.idaDoThisShit(targetBoard, actualBoard, iterator)
+            if solved:
+                return expandedNodes, b
+            iterator += 1
+
+    
+    def idaDoThisShit(self, targetBoard, actualBoard, dLimit):
+        expandedNodes = []
+        solved = False
+        b = sum(actualBoard.possibleMoves)
+        NodetoExpand = Q.PriorityQueue()
+        NodetoExpand.put((actualBoard.h,actualBoard))
+        while True:
+            if NodetoExpand.empty():
+                break          
+            nodeToParse = NodetoExpand.get()
+            if nodeToParse[1] == targetBoard:
+                solved = True
+                print(nodeToParse[1])
+                break
+            moves = nodeToParse[1].possibleMoves[:]
+            b = (sum(moves)+b)/2
+            expandedNodes.append(nodeToParse[1])
+            index = 0
+            while index < 4:
+                boardCopy = nodeToParse[1].copy()
+                boardCopy.d += 1
+                if moves[index] == 1:
+                    if index == 0:                 
+                        boardCopy.moveUp()
+                    elif index == 1:                   
+                        boardCopy.moveDown()
+                    elif index == 2:                  
+                        boardCopy.moveLeft()
+                    elif index == 3:                
+                        boardCopy.moveRight()
+                if boardCopy not in expandedNodes:
+                    temp = []
+                    while not NodetoExpand.empty():
+                        temp.append(NodetoExpand.get()[1])
+                    if boardCopy not in temp:
+                        boardCopy.manhattanDistanceValue(targetBoard)
+                        if not boardCopy.d > dLimit:
+                            NodetoExpand.put((boardCopy.h,boardCopy))
+                    for item in temp:
+                        NodetoExpand.put((item.h,item))
+                index += 1
+        return expandedNodes,b, solved
