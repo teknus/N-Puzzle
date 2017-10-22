@@ -252,6 +252,7 @@ class BoardH(Board):
         self.actualManhattan = dict()
         self.d = 0
         self.h = 0
+        self.d = 0
 
     def loadMatrix(self, path):
         with open(path, 'r') as arq:
@@ -430,9 +431,19 @@ class BoardH(Board):
                         NodetoExpand.put((item.h,item))
                 index += 1
         return expandedNodes,b
+    
+    def idaStar(self, targetBoard, actualBoard):
+        iterator = 1
+        while True:
+            expandedNodes,b, solved = self.idaDoThisShit(targetBoard, actualBoard, iterator)
+            if solved:
+                return expandedNodes, b
+            iterator += 1
 
-    def IDA(self, targetBoard,actualBoard):
+    
+    def idaDoThisShit(self, targetBoard, actualBoard, dLimit):
         expandedNodes = []
+        solved = False
         b = sum(actualBoard.possibleMoves)
         NodetoExpand = Q.PriorityQueue()
         NodetoExpand.put((actualBoard.h,actualBoard))
@@ -441,6 +452,8 @@ class BoardH(Board):
                 break          
             nodeToParse = NodetoExpand.get()
             if nodeToParse[1] == targetBoard:
+                solved = True
+                #print(nodeToParse[1])
                 break
             moves = nodeToParse[1].possibleMoves[:]
             b = (sum(moves)+b)/2
@@ -448,6 +461,7 @@ class BoardH(Board):
             index = 0
             while index < 4:
                 boardCopy = nodeToParse[1].copy()
+                boardCopy.d += 1
                 if moves[index] == 1:
                     if index == 0:                 
                         boardCopy.moveUp()
@@ -463,9 +477,10 @@ class BoardH(Board):
                         temp.append(NodetoExpand.get()[1])
                     if boardCopy not in temp:
                         boardCopy.manhattanDistanceValue(targetBoard)
-                        NodetoExpand.put((boardCopy.h,boardCopy))
+                        if not boardCopy.d > dLimit:
+                            NodetoExpand.put((boardCopy.h,boardCopy))
                     for item in temp:
                         NodetoExpand.put((item.h,item))
                 index += 1
-        return expandedNodes,b
+        return expandedNodes,b, solved 
 #Guardar a profundidade junto com o nó na lista de nós para expandir
