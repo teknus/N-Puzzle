@@ -4,13 +4,13 @@ from time import time
 m = BoardH()
 
 pth = path.abspath("")
-pth = pth[:len(pth)-3]+"inst/test3.txt"
+pth = pth[:len(pth)-3]+"inst/test5.txt"
 m.loadMatrix(pth)
 obj = BoardH()
 obj.loadMatrix(pth)
 print("Pre shuffle")
 print(m)
-randmoves = 5
+randmoves = 10
 m.shuffleInstance(randmoves)
 print("random moves : ", randmoves)
 print("Pos shuffle")
@@ -40,10 +40,10 @@ print("Ramificação media: {}".format(b))
 print("Nós expandidos: ", len(exp))
 print("profundidade: {}".format(d))
 
-# print("IDA*")
-# timea = time()
-# exp, b, d = m.idaStar(obj,m)
-# print("tempo : {}".format((time()-timea)*1000))
-# print("Ramificação media: {}".format(b))
-# print("Nós expandidos: ", len(exp))
-# print("profundidade: {}".format(d))
+print("IDA*")
+timea = time()
+exp, b, d = m.idaStar(obj,m)
+print("tempo : {}".format((time()-timea)*1000))
+print("Ramificação media: {}".format(b))
+print("Nós expandidos: ", len(exp))
+print("profundidade: {}".format(d))

@@ -3,7 +3,6 @@ from random import randint
 from os import path
 import queue as Q
 
-
 class Board:
     
     def __init__(self):
@@ -215,7 +214,7 @@ class Board:
             expandedNodes,b, solved, d = self.dfsL(targetBoard, actualBoard, iterator)
             if solved:
                 return expandedNodes, b, d
-            iterator += 3
+            iterator += 2
     
     def dfsL(self, targetBoard,actualBoard, dLimit):
         expandedNodes = []
@@ -425,7 +424,7 @@ class BoardH(Board):
             index = 0
             while index < 4:
                 boardCopy = nodeToParse[1].copy()
-                boardCopy.d += 1
+                boardCopy.d = nodeToParse[1].d + 1
                 if moves[index] == 1:
                     if index == 0:                 
                         boardCopy.moveUp()
@@ -447,8 +446,8 @@ class BoardH(Board):
                 index += 1
     
     def idaStar(self, targetBoard, actualBoard):
-        iterator = 0
         actualBoard.manhattanDistanceValue(targetBoard)
+        nos = Q.PriorityQueue()
         limit = actualBoard.h
         while True:
             expandedNodes, b, solved, limit, d = self.idaDoThis(targetBoard, actualBoard, limit)
@@ -458,29 +457,31 @@ class BoardH(Board):
     
     def idaDoThis(self, targetBoard, actualBoard, dLimit):
         expandedNodes = []
-        solved = False
         b = sum(actualBoard.possibleMoves)
         NodetoExpand = Q.PriorityQueue()
-        NodeNotExpanded = Q.PriorityQueue()
+        NodeNotExpand = Q.PriorityQueue()
         NodetoExpand.put((actualBoard.h,actualBoard))
+        solved = False
         while True:
             if NodetoExpand.empty():
-                limit = NodeNotExpanded.get()[0]
-                while not limit < dLimit:
-                    print("Menor")
-                    limit = NodeNotExpanded.get()[0]
-                return expandedNodes, b, solved,limit, 0           
+                n = NodeNotExpand.get()
+                limit = n[0] + dLimit
+                while limit < dLimit:
+                    limit = n[0] + dLimit
+                    NodeNotExpand.put(n)
+                return expandedNodes,b,False,limit,nodeToParse[1].d      
             nodeToParse = NodetoExpand.get()
+            
             if nodeToParse[1] == targetBoard:
-                solved = True
-                return expandedNodes,b, solved,0 ,nodeToParse[1].d
+                return expandedNodes,b,True,0,nodeToParse[1].d
             moves = nodeToParse[1].possibleMoves[:]
             b = (sum(moves)+b)/2
             expandedNodes.append(nodeToParse[1])
             index = 0
+           
             while index < 4:
                 boardCopy = nodeToParse[1].copy()
-                boardCopy.d += 1
+                boardCopy.d = nodeToParse[1].d + 1
                 if moves[index] == 1:
                     if index == 0:                 
                         boardCopy.moveUp()
@@ -494,19 +495,13 @@ class BoardH(Board):
                     temp = []
                     while not NodetoExpand.empty():
                         temp.append(NodetoExpand.get()[1])
-                    if boardCopy not in expandedNodes:
-                        temp = []
-                        while not NodetoExpand.empty():
-                            temp.append(NodetoExpand.get()[1])
-                        if boardCopy not in temp:
-                            boardCopy.manhattanDistanceValue(targetBoard)
-                            if not boardCopy.d > dLimit:
-                                NodetoExpand.put((boardCopy.h,boardCopy))
-                            else:
-                                NodetoExpand.put((boardCopy.h,boardCopy))
-                        for item in temp:
-                            NodetoExpand.put((item.h,item))
-                        break
+                    if boardCopy not in temp:
+                        boardCopy.manhattanDistanceValue(targetBoard)
+                        if boardCopy.h < dLimit:
+                            NodetoExpand.put((boardCopy.h,boardCopy))
+                        else:
+                            NodeNotExpand.put((boardCopy.h,boardCopy))
+                    for item in temp:
+                        NodetoExpand.put((item.h,item))
                 index += 1
-
 #Guardar a profundidade junto com o nó na lista de nós para expandir
