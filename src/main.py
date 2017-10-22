@@ -4,13 +4,13 @@ from time import time
 m = BoardH()
 
 pth = path.abspath("")
-pth = pth[:len(pth)-3]+"inst/test5.txt"
+pth = pth[:len(pth)-3]+"inst/test3.txt"
 m.loadMatrix(pth)
 obj = BoardH()
 obj.loadMatrix(pth)
 print("Pre shuffle")
 print(m)
-randmoves = 10
+randmoves = 3
 m.shuffleInstance(randmoves)
 print("random moves : ", randmoves)
 print("Pos shuffle")
