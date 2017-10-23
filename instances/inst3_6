@@ -1,0 +1,24 @@
+Pre shuffle
+
+|1 2 3 |
+|4 5 6 |
+|7 8 0 |
+
+random moves :  200
+Pos shuffle
+
+|5 1 3 |
+|7 8 2 |
+|0 6 4 |
+
+A*
+tempo : 27.975797653198242
+Ramificação media: 3.1615537160947724
+Nós expandidos:  44
+profundidade: 28
+IDA*
+tempo : 26.181459426879883
+Ramificação media: 3.1615537160947724
+Nós expandidos:  44
+profundidade: 28
+DFS
